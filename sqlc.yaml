@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    name: "db"
+    queries: "./db/query"
+    schema: "./db/migration/"
+    gen:
+      go:
+        package: "sqlcSimpleBank"
+        out: "simplebankQuery"
+        sql_package: "pgx/v5"
