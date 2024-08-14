@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: entries.sql
 
-package sqlcSimpleBank
+package db
 
 import (
 	"context"
@@ -15,20 +15,25 @@ INSERT INTO entries (
   amount
 )VALUES(
   $1, $2
-) RETURNING id
+) RETURNING id, account_id, amount, created_at
 `
 
 type CreateEntryParams struct {
-	AccountID int64
-	Amount    int64
+	AccountID int64 `json:"account_id"`
+	Amount    int64 `json:"amount"`
 }
 
 // description: Create a new entry
-func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createEntry, arg.AccountID, arg.Amount)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error) {
+	row := q.db.QueryRowContext(ctx, createEntry, arg.AccountID, arg.Amount)
+	var i Entry
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.Amount,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getEntry = `-- name: GetEntry :one
@@ -36,7 +41,7 @@ SELECT id, account_id, amount, created_at FROM entries WHERE id=$1 LIMIT 1
 `
 
 func (q *Queries) GetEntry(ctx context.Context, id int64) (Entry, error) {
-	row := q.db.QueryRow(ctx, getEntry, id)
+	row := q.db.QueryRowContext(ctx, getEntry, id)
 	var i Entry
 	err := row.Scan(
 		&i.ID,
@@ -53,12 +58,12 @@ SELECT id, account_id, amount, created_at From entries ORDER BY id LIMIT $1 OFFS
 `
 
 type ListEntriesParams struct {
-	Limit  int32
-	Offset int32
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error) {
-	rows, err := q.db.Query(ctx, listEntries, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listEntries, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +80,9 @@ func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Ent
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

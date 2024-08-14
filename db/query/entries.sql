@@ -5,7 +5,7 @@ INSERT INTO entries (
   amount
 )VALUES(
   $1, $2
-) RETURNING id;
+) RETURNING *;
 
 
 -- name: GetEntry :one
