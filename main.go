@@ -1,11 +1,20 @@
 package main
 
-import (
-	"fmt"
-	"simple-bank/util"
-)
+import "fmt"
 
+//ronald
+
+// ro ron rona ronal
+// ona onal onald
+// na ald, ld
 func main() {
 
-	fmt.Println(util.RandomString(2))
+	str := "ronald"
+
+	for i := 0; i <= len(str); i++ {
+		for j := 0; j <= i; j++ {
+			fmt.Println(str[j:i])
+		}
+	}
+
 }

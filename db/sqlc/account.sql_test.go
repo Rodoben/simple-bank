@@ -9,8 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_CreateAccount(t *testing.T) {
-
+func CreateRandomAccount(t *testing.T) (Account, CreateAccountParams, error) {
 	var context = context.Background()
 
 	args := CreateAccountParams{
@@ -18,8 +17,17 @@ func Test_CreateAccount(t *testing.T) {
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
+	account, err := testStore.CreateAccount(context, args)
 
-	result, err := testStore.CreateAccount(context, args)
+	if err != nil {
+		return Account{}, CreateAccountParams{}, err
+	}
+	return account, args, nil
+}
+
+func Test_CreateAccount(t *testing.T) {
+	result, args, err := CreateRandomAccount(t)
+
 	assert.NoError(t, err, "they should not be any error!")
 	assert.Equal(t, result.Owner, args.Owner)
 	assert.Equal(t, result.Currency, args.Currency)
