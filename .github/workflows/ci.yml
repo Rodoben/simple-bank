@@ -1,16 +1,16 @@
 name: Run Unit tests
 
-on:
- push:
+ on:
+  push:
    branches: [master]
- pull_request:
+  pull_request:
    branches: [master]
 
-jobs:
- test:
-   name: Test
-   runs-on: ubuntu-latest
-   services:
+ jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
      postgres:
        image: postgres:14-alpine
        ports:
@@ -25,21 +25,21 @@ jobs:
          -- health-timeout 5s
          -- health-retries 5
 
-  steps:
-  - name: Set Up Go 1.X
-    uses: actions/setup-go@v2
+   steps:
+   - name: Set Up Go 1.X
+     uses: actions/setup-go@v2
 
-  - name: Chackout code into the Go Module directory
-    uses: action/checkout@v2
+   - name: Chackout code into the Go Module directory
+     uses: action/checkout@v2
 
-  - name: Install golang-migrate
-    run: |
+   - name: Install golang-migrate
+     run: |
        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz
        sudo mv migrate.linux-amd64 /usr/bin/migrate
        which migrate
 
-  - name: Run Migration
-    run: make migrate
+   - name: Run Migration
+     run: make migrate
     
-  - name: Test
-    run: make test
+   - name: Test
+     run: make test
