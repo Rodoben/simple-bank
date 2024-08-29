@@ -5,9 +5,16 @@
 
 package db
 
+
+
+
+
 import (
 	"context"
 )
+
+
+type  CreateAccount = func (ctx context.Context, arg CreateAccountParams) (Account, error)
 
 const addAccountBalance = `-- name: AddAccountBalance :one
 UPDATE accounts

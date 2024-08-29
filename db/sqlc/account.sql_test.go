@@ -41,35 +41,29 @@ func Test_GetAccount(t *testing.T) {
 	var ctx = context.Background()
 
 	tests := []struct {
-		id              int64
-		exprectedoutput Account
+		name              string
+		createAccountArgs CreateAccountParams
 	}{
-		{id: 1, exprectedoutput: Account{
-			ID:       1,
-			Owner:    "trbmvg",
-			Balance:  1,
-			Currency: "USD",
-		}},
-		{id: 2, exprectedoutput: Account{
-			ID:       2,
-			Owner:    "yxabhv",
-			Balance:  1,
-			Currency: "USD",
-		}},
-		{id: 3, exprectedoutput: Account{
-			ID:       3,
-			Owner:    "zptwwc",
-			Balance:  2,
-			Currency: "USD",
-		}},
+		{
+			name: "GetAccounts",
+			createAccountArgs: CreateAccountParams{
+				Owner:    util.RandomOwner(),
+				Balance:  util.RandomMoney(),
+				Currency: util.RandomCurrency(),
+			},
+		},
 	}
 
 	for _, test := range tests {
-		result, err := testStore.GetAccount(ctx, test.id)
+
+		account, err := testStore.CreateAccount(ctx, test.createAccountArgs)
+		assert.NoError(t, err, "error")
+		result, err := testStore.GetAccount(ctx, account.ID)
 
 		assert.NoError(t, err, "error")
-		assert.Equal(t, result.ID, test.exprectedoutput.ID)
-		assert.Equal(t, result.Owner, test.exprectedoutput.Owner)
+		assert.Equal(t, result.ID, account.ID)
+		assert.Equal(t, result.Owner, account.Owner)
+		assert.Equal(t, result.Currency, account.Currency)
 		fmt.Println(result)
 	}
 
