@@ -18,7 +18,7 @@ func main() {
 
 	conn, err := sql.Open(dbDriver, dsn)
 	if err != nil {
-		log.Fatalf("unable to connect to db", err)
+		log.Fatalf("unable to connect to db %v", err)
 	}
 	store := db.NewStore(conn)
 	server := api.NewServer(*store)
