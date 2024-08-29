@@ -1,20 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"database/sql"
+	"log"
+	"simple-bank/api"
+	db "simple-bank/db/sqlc"
 
-//ronald
+	_ "github.com/lib/pq"
+)
 
-// ro ron rona ronal
-// ona onal onald
-// na ald, ld
+const (
+	dsn      = "postgresql://username1:strongpassword@localhost:5432/simplebank?sslmode=disable"
+	dbDriver = "postgres"
+)
+
 func main() {
 
-	str := "ronald"
-
-	for i := 0; i <= len(str); i++ {
-		for j := 0; j <= i; j++ {
-			fmt.Println(str[j:i])
-		}
+	conn, err := sql.Open(dbDriver, dsn)
+	if err != nil {
+		log.Fatalf("unable to connect to db", err)
 	}
-
+	store := db.NewStore(conn)
+	server := api.NewServer(*store)
+	server.Start(":8080")
 }

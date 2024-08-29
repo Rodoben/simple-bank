@@ -1,0 +1,89 @@
+package api
+
+import (
+	"fmt"
+	"net/http"
+	db "simple-bank/db/sqlc"
+
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+)
+
+type CreateRequestParams struct {
+	Owner    string `json:"owner" binding:"required"`
+	Currency string `json:"currency" binding:"required,oneof=USD IND AED"`
+}
+
+func (server *Server) CreateAccount(ctx *gin.Context) {
+
+	var req CreateRequestParams
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	args := db.CreateAccountParams{
+		Owner:    req.Owner,
+		Balance:  0,
+		Currency: req.Currency,
+	}
+	account, err := server.DbStore.CreateAccount(ctx, args)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, account)
+
+}
+
+type getAccountRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) GetAccount(ctx *gin.Context) {
+	var id getAccountRequest
+	if err := ctx.ShouldBindUri(&id); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	account, err := server.DbStore.GetAccount(ctx, id.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, account)
+
+}
+
+type ListAccountsParams struct {
+	PageId   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+func (server *Server) ListAccounts(ctx *gin.Context) {
+
+	var listAccountParams ListAccountsParams
+	if err := ctx.ShouldBindQuery(&listAccountParams); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	fmt.Println(listAccountParams)
+	args := db.ListAccountsParams{
+		Limit:  listAccountParams.PageSize,
+		Offset: listAccountParams.PageId,
+	}
+
+	accounts, err := server.DbStore.ListAccounts(ctx, args)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, accounts)
+
+}
