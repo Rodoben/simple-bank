@@ -11,7 +11,7 @@ import (
 
 type CreateRequestParams struct {
 	Owner    string `json:"owner" binding:"required"`
-	Currency string `json:"currency" binding:"required,oneof=USD IND AED"`
+	Currency string `json:"currency" binding:"required,oneof=USD INR AED TBH"`
 }
 
 func (server *Server) CreateAccount(ctx *gin.Context) {
@@ -34,7 +34,7 @@ func (server *Server) CreateAccount(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, account)
+	ctx.JSON(http.StatusCreated, account)
 
 }
 
@@ -74,9 +74,11 @@ func (server *Server) ListAccounts(ctx *gin.Context) {
 
 	fmt.Println(listAccountParams)
 	args := db.ListAccountsParams{
-		Limit:  listAccountParams.PageSize,
-		Offset: listAccountParams.PageId,
+		Offset: listAccountParams.PageSize,
+		Limit:  listAccountParams.PageId,
 	}
+
+	fmt.Println("args", args)
 
 	accounts, err := server.DbStore.ListAccounts(ctx, args)
 	if err != nil {

@@ -11,11 +11,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	dsn      = "postgresql://username1:strongpassword@localhost:5432/simplebank?sslmode=disable"
-	dbDriver = "postgres"
-)
-
 func main() {
 
 	config, err := util.LoadConfig()
@@ -28,7 +23,7 @@ func main() {
 		log.Fatalf("unable to connect to db %v", err)
 	}
 	store := db.NewStore(conn)
-	server := api.NewServer(*store)
+	server := api.NewServer(store)
 	fmt.Println("__", config.HTTPServer)
 	server.Start(config.HTTPServer)
 }

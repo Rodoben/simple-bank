@@ -6,19 +6,24 @@ import (
 	"fmt"
 )
 
-type Store struct {
+//go:generate mockgen -package mockdb -destination db/mock/store.go simple-bank/db/sqlc Store
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, args TransferTxParams) (TransferTxResult, error)
+}
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -48,7 +53,7 @@ type TransferTxResult struct {
 	ToEntry     Entry    `json:"to_entry"`
 }
 
-func (store *Store) TransferTx(ctx context.Context, args TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, args TransferTxParams) (TransferTxResult, error) {
 
 	var result TransferTxResult
 

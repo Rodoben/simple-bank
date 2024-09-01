@@ -16,7 +16,7 @@ const (
 	dbDriver = "postgres"
 )
 
-var testStore *Store
+var testStore Store
 
 func TestMain(m *testing.M) {
 
