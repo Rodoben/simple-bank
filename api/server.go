@@ -4,6 +4,8 @@ import (
 	db "simple-bank/db/sqlc"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type Server struct {
@@ -25,9 +27,15 @@ func NewServer(store db.Store) *Server {
 
 func (server *Server) SetRoutes() {
 
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", validCurrrency)
+	}
+
 	server.router.POST("/account", server.CreateAccount)
 	server.router.GET("/account/:id", server.GetAccount)
 	server.router.GET("/accounts", server.ListAccounts)
+
+	server.router.POST("/transfer", server.CreateTransfer)
 
 }
 
