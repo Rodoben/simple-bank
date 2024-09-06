@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	db "simple-bank/db/sqlc"
 
@@ -72,13 +71,10 @@ func (server *Server) ListAccounts(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(listAccountParams)
 	args := db.ListAccountsParams{
 		Offset: listAccountParams.PageSize,
 		Limit:  listAccountParams.PageId,
 	}
-
-	fmt.Println("args", args)
 
 	accounts, err := server.DbStore.ListAccounts(ctx, args)
 	if err != nil {
