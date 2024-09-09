@@ -10,18 +10,25 @@ import (
 )
 
 func CreateRandomAccount(t *testing.T) (Account, CreateAccountParams, error) {
+	fmt.Println("I am here")
 	var context = context.Background()
 
+	user := CreateRandomUser(t)
 	args := CreateAccountParams{
-		Owner:    util.RandomOwner(),
+		Owner:    user.Username,
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
+	fmt.Println("args", args)
+
 	account, err := testStore.CreateAccount(context, args)
+	fmt.Println(account)
 
 	if err != nil {
+		fmt.Println("i am getting here?")
 		return Account{}, CreateAccountParams{}, err
 	}
+	fmt.Println("1", account)
 	return account, args, nil
 }
 
@@ -33,12 +40,14 @@ func Test_CreateAccount(t *testing.T) {
 	assert.Equal(t, result.Currency, args.Currency)
 	assert.Equal(t, result.Currency, args.Currency)
 	assert.NotZero(t, result.ID)
-	assert.NotZero(t, result.CreatedAt)
+	assert.NotEmpty(t, result.CreatedAt)
 }
 
 func Test_GetAccount(t *testing.T) {
 
 	var ctx = context.Background()
+
+	user := CreateRandomUser(t)
 
 	tests := []struct {
 		name              string
@@ -47,7 +56,7 @@ func Test_GetAccount(t *testing.T) {
 		{
 			name: "GetAccounts",
 			createAccountArgs: CreateAccountParams{
-				Owner:    util.RandomOwner(),
+				Owner:    user.Username,
 				Balance:  util.RandomMoney(),
 				Currency: util.RandomCurrency(),
 			},

@@ -22,15 +22,18 @@ func (server *Server) CreateTransfer(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println("1", transfer)
+
 	_, ok := server.validAccount(ctx, transfer.FromAccountId, transfer.Currency)
 	if !ok {
 		return
 	}
-
+	fmt.Println("2")
 	_, ok = server.validAccount(ctx, transfer.ToAccountId, transfer.Currency)
 	if !ok {
 		return
 	}
+	fmt.Println("3")
 	// TODO: implement transfer logic
 	args := db.TransferTxParams{
 		FromAccountID: transfer.FromAccountId,
@@ -53,6 +56,8 @@ func (server *Server) validAccount(ctx *gin.Context, accountId int64, currency s
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return account, false
 	}
+
+	fmt.Println(account.Currency, currency)
 
 	if account.Currency != currency {
 		err := fmt.Errorf("account [%d] currency mismatch: %s vs %s", account.ID, account.Currency, currency)

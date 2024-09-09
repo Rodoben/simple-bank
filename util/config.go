@@ -8,8 +8,8 @@ type Config struct {
 	HTTPServer string `mapstructure:"HTTP_SERVER_ADDRESS"`
 }
 
-func LoadConfig() (config Config, err error) {
-	viper.AddConfigPath(".")
+func LoadConfig(path string) (config Config, err error) {
+	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()

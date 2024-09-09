@@ -37,6 +37,8 @@ func (server *Server) SetRoutes() {
 
 	server.router.POST("/transfer", server.CreateTransfer)
 
+	server.router.POST("/user", server.CreateUser)
+
 }
 
 func (server *Server) Start(address string) error {
