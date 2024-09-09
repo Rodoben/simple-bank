@@ -44,7 +44,7 @@ func (server *Server) CreateUser(ctx *gin.Context) {
 	}
 
 	// generatepassword
-	password, err := server.generateTempPassword(ctx)
+	password, err := server.generateTempPassword()
 	if err != nil {
 		return
 	}
