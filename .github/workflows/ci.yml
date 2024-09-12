@@ -26,12 +26,16 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/setup-go@v2
-      with:
-        go-version: ^1.22
-      id: go
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - uses: actions/setup-go@v2
+    - name: Set up Go
+      uses: actions/setup-go@v4  # Updated version
+      with:
+        go-version: '1.20'
+
+    - name: Install dependencies
+      run: go mod tidy
 
     - name: Installl golang-migrate
       run: |

@@ -32,3 +32,17 @@ func TestCreateJwtToken(t *testing.T) {
 	assert.WithinDuration(t, expiredAt, payload.ExpiredAt, time.Second)
 
 }
+
+func TestExpiredToken(t *testing.T) {
+
+	maker, err := NewJwtMaker(util.RandomString(32))
+	assert.NoError(t, err)
+	token, err := maker.CreateToken(util.RandomOwner(), -time.Minute)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, token)
+	payload, err := maker.VerifyToken(token)
+	assert.Error(t, err)
+	assert.EqualError(t, err, ErrorInvalidToken.Error())
+	assert.Nil(t, payload)
+
+}
