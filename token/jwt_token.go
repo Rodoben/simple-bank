@@ -2,6 +2,7 @@ package token
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,22 +27,23 @@ func NewJwtMaker(secretKey string) (Maker, error) {
 
 }
 
-func (maker *JwtMaker) CreateToken(username string, duration time.Duration) (token string, err error) {
+func (maker *JwtMaker) CreateToken(username string, duration time.Duration) (string, error) {
 	//   initialize an new payload
-
+	fmt.Println("1")
 	payload, err := Newpayload(username, duration)
 	if err != nil {
 		return "", nil
 	}
+	fmt.Println("2")
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 
 	// create a jwt token with claims
+	fmt.Println("3")
 
-	token, err = jwtToken.SignedString([]byte(maker.secretkey))
-
+	fmt.Println("4")
 	// create a token with signedString
-	return token, err
+	return jwtToken.SignedString([]byte(maker.secretkey))
 }
 
 func (maker *JwtMaker) VerifyToken(token string) (*Payload, error) {

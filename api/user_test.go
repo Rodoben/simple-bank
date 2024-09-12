@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	mockdb "simple-bank/db/mock"
@@ -35,7 +36,7 @@ func CreateRandomUser(t *testing.T) {
 		{
 			name: "Bad payload",
 			payloadBody: `{
-                    "user_name": "roro
+                    "username": "roro
                     "full_name": "ronald benjamin",
                     "email":  "ronald.benjamin008@gmail.com",
                     "contact" : "9986398896"
@@ -55,9 +56,9 @@ func CreateRandomUser(t *testing.T) {
 		{
 			name: "Internal Server error",
 			payloadBody: `{
-                    "user_name": "roro",
+                    "username": "roro",
                     "full_name": "ronald benjamin",
-                    "email":  "ronald.benjamin008@gmail.com",
+                    "email":  "ronald.benjamin008@gmail.co",
                     "contact" : "9986398896"
                 }`,
 			expectedStatusCode: http.StatusInternalServerError,
@@ -74,14 +75,16 @@ func CreateRandomUser(t *testing.T) {
 				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(createUserRequestargs.Username)).Times(1).Return(db.User{}, sql.ErrNoRows)
 
 				// Simulate internal server error during CreateUser call
-				store.EXPECT().Createuser(gomock.Any(), gomock.AssignableToTypeOf(db.CreateuserParams{})).Times(1).Return(db.User{}, errors.New("internal server error"))
+				store.EXPECT().Createuser(gomock.Any(), gomock.AssignableToTypeOf(createUserRequestargs)).Times(1).Return(db.User{}, errors.New("internal server error"))
 			},
 			checkResponse: func(t *testing.T, user db.User, body *bytes.Buffer) {
 
 				var createdUser db.User
 				err := json.NewDecoder(body).Decode(&createdUser)
 				assert.NoError(t, err)
+				fmt.Println("check", user.Username, createdUser.Username)
 				assert.Equal(t, user.Username, createdUser.Username)
+				fmt.Println("check", user.Email, createdUser.Email)
 				assert.Equal(t, user.Email, createdUser.Email)
 				assert.Equal(t, user.FullName, createdUser.FullName)
 				assert.Equal(t, user.Contact, createdUser.Contact)
@@ -92,7 +95,7 @@ func CreateRandomUser(t *testing.T) {
 		{
 			name: "OK",
 			payloadBody: `{
-                    "user_name": "roro",
+                    "username": "roro",
                     "full_name": "ronald benjamin",
                     "email":  "ronald.benjamin008@gmail.com",
                     "contact" : "9986398896"
@@ -110,16 +113,19 @@ func CreateRandomUser(t *testing.T) {
 
 				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(createUserRequestargs.Username)).Times(1).Return(db.User{}, sql.ErrNoRows)
 				user := RandomUser1(createUserRequestargs)
-				store.EXPECT().Createuser(gomock.Any(), gomock.AssignableToTypeOf(db.CreateuserParams{})).Times(1).Return(user, nil)
+				store.EXPECT().Createuser(gomock.Any(), gomock.AssignableToTypeOf(createUserRequestargs)).Times(1).Return(user, nil)
 			},
 			checkResponse: func(t *testing.T, user db.User, body *bytes.Buffer) {
 
 				var createdUser db.User
 				err := json.NewDecoder(body).Decode(&createdUser)
 				assert.NoError(t, err)
+				fmt.Println("check", user.Username, createdUser.Username)
 				assert.Equal(t, user.Username, createdUser.Username)
+				fmt.Println("check", user.Email, createdUser.Email)
 				assert.Equal(t, user.Email, createdUser.Email)
 				assert.Equal(t, user.FullName, createdUser.FullName)
+				fmt.Println("check", user.FullName, createdUser.FullName)
 				assert.Equal(t, user.Contact, createdUser.Contact)
 
 			},
@@ -152,7 +158,9 @@ func CreateRandomUser(t *testing.T) {
 
 			user := db.User{}
 
+			fmt.Println(res.Body)
 			err = json.Unmarshal(res.Body.Bytes(), &user)
+			fmt.Println("3", user.Username)
 			assert.NoError(t, err)
 			test.checkResponse(t, user, res.Body)
 

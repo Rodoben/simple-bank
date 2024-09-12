@@ -104,6 +104,52 @@ func TestCreateTransfer(t *testing.T) {
 	}
 }
 
+// func TestValidAccount(t *testing.T) {
+
+// 	type args struct {
+// 		ctx       *gin.Context
+// 		accountId int64
+// 		currency  string
+// 	}
+// 	tests := []struct {
+// 		name           string
+// 		expectedresult bool
+// 		args           args
+// 		setupStubs     func(store *mockdb.MockStore)
+// 	}{
+
+// 		{
+// 			name:           "valid account",
+// 			expectedresult: true,
+// 			args: args{
+// 				ctx:       &gin.Context{},
+// 				accountId: 2,
+// 				currency:  "USD",
+// 			},
+// 			setupStubs: func(store *mockdb.MockStore) {
+
+// 				store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).Times(1).Return(db.Account{
+// 					ID: 2,
+// 				}, nil)
+// 			},
+// 		},
+// 	}
+
+// 	for _, test := range tests {
+// 		t.Run(test.name, func(t *testing.T) {
+
+// 			ctrl := gomock.NewController(t)
+// 			defer ctrl.Finish()
+// 			store := mockdb.NewMockStore(ctrl)
+// 			test.setupStubs(store)
+// 			server := NewServer(store)
+
+// 			_, ok := server.validAccount(test.args.ctx, test.args.accountId, test.args.currency)
+// 			assert.Equal(t, ok, test.expectedresult)
+// 		})
+// 	}
+// }
+
 func CreateRandomAccount(user db.User) db.Account {
 	id := util.RandomInt(1, 1000)
 	return db.Account{

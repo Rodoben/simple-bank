@@ -15,16 +15,16 @@ var (
 type Payload struct {
 	Id        uuid.UUID
 	Username  string
-	createdAt time.Time
+	CreatedAt time.Time
 	ExpiredAt time.Time
 }
 
 func Newpayload(username string, duration time.Duration) (*Payload, error) {
-
+	now := time.Now()
 	return &Payload{
 		Id:        uuid.New(),
 		Username:  username,
-		createdAt: time.Now(),
+		CreatedAt: now,
 		ExpiredAt: time.Now().Add(duration),
 	}, nil
 
