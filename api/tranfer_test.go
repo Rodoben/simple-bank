@@ -87,7 +87,7 @@ func TestCreateTransfer(t *testing.T) {
 			test.setupStub(store, payload)
 
 			url := "/transfer"
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(test.payloadBody)))
 			assert.NoError(t, err)
 			recorder := httptest.NewRecorder()

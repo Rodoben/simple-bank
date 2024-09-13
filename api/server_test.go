@@ -16,7 +16,7 @@ func TestServer_SetRoutes(t *testing.T) {
 
 	store := mockdb.NewMockStore(ctrl)
 
-	server := NewServer(store)
+	server := newTestServer(t, store)
 	testCases := []struct {
 		method string
 		path   string

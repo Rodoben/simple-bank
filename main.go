@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"simple-bank/api"
 	db "simple-bank/db/sqlc"
@@ -23,7 +22,9 @@ func main() {
 		log.Fatalf("unable to connect to db %v", err)
 	}
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
-	fmt.Println("__", config.HTTPServer)
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatalf("unable to start server %v", err)
+	}
 	server.Start(config.HTTPServer)
 }

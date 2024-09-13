@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -72,7 +71,7 @@ func CreateRandomUser(t *testing.T) {
 					Contact: createuserargs.Contact,
 				}
 
-				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(createUserRequestargs.Username)).Times(1).Return(db.User{}, sql.ErrNoRows)
+				//		store.EXPECT().GetUser(gomock.Any(), gomock.Eq(createUserRequestargs.Username)).Times(1).Return(db.User{}, sql.ErrNoRows)
 
 				// Simulate internal server error during CreateUser call
 				store.EXPECT().Createuser(gomock.Any(), gomock.AssignableToTypeOf(createUserRequestargs)).Times(1).Return(db.User{}, errors.New("internal server error"))
@@ -111,7 +110,7 @@ func CreateRandomUser(t *testing.T) {
 					Contact: createuserargs.Contact,
 				}
 
-				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(createUserRequestargs.Username)).Times(1).Return(db.User{}, sql.ErrNoRows)
+				//store.EXPECT().GetUser(gomock.Any(), gomock.Eq(createUserRequestargs.Username)).Times(1).Return(db.User{}, sql.ErrNoRows)
 				user := RandomUser1(createUserRequestargs)
 				store.EXPECT().Createuser(gomock.Any(), gomock.AssignableToTypeOf(createUserRequestargs)).Times(1).Return(user, nil)
 			},
@@ -147,7 +146,7 @@ func CreateRandomUser(t *testing.T) {
 
 			test.setupStub(store, payload)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			res := httptest.NewRecorder()
 			url := "/user"
 			req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(test.payloadBody)))

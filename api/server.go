@@ -2,6 +2,8 @@ package api
 
 import (
 	db "simple-bank/db/sqlc"
+	"simple-bank/token"
+	"simple-bank/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -9,19 +11,27 @@ import (
 )
 
 type Server struct {
+	Config  util.Config
 	DbStore db.Store
+	token   token.Maker
 	router  *gin.Engine
 }
 
-func NewServer(store db.Store) *Server {
+func NewServer(config util.Config, store db.Store) (*Server, error) {
+	token, err := token.NewJwtMaker(config.AuthTokenKey)
+	if err != nil {
+		return nil, err
+	}
 	server := Server{
+		Config:  config,
 		DbStore: store,
+		token:   token,
 		router:  gin.Default(),
 	}
 
 	server.SetRoutes()
 
-	return &server
+	return &server, nil
 
 }
 
@@ -38,6 +48,8 @@ func (server *Server) SetRoutes() {
 	server.router.POST("/transfer", server.CreateTransfer)
 
 	server.router.POST("/user", server.CreateUser)
+
+	server.router.POST("/user/login", server.LoginUser)
 
 }
 
