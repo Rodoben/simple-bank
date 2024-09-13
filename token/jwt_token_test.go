@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,6 +44,25 @@ func TestExpiredToken(t *testing.T) {
 	payload, err := maker.VerifyToken(token)
 	assert.Error(t, err)
 	assert.EqualError(t, err, ErrorInvalidToken.Error())
+	assert.Nil(t, payload)
+
+}
+
+func TestInvalidToken(t *testing.T) {
+	payload, err := Newpayload(util.RandomOwner(), time.Minute)
+	assert.NoError(t, err)
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodNone, payload)
+	token, err := jwtToken.SignedString(jwt.UnsafeAllowNoneSignatureType)
+	assert.NoError(t, err)
+
+	maker, err := NewJwtMaker(util.RandomString(32))
+
+	assert.NoError(t, err)
+
+	payload, err = maker.VerifyToken(token)
+	assert.Error(t, err)
+	assert.EqualError(t, err, ErrorExpiredToken.Error())
 	assert.Nil(t, payload)
 
 }
