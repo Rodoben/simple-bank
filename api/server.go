@@ -41,15 +41,14 @@ func (server *Server) SetRoutes() {
 		v.RegisterValidation("currency", validCurrrency)
 	}
 
-	server.router.POST("/account", server.CreateAccount)
-	server.router.GET("/account/:id", server.GetAccount)
-	server.router.GET("/accounts", server.ListAccounts)
-
-	server.router.POST("/transfer", server.CreateTransfer)
-
 	server.router.POST("/user", server.CreateUser)
-
 	server.router.POST("/user/login", server.LoginUser)
+
+	authRoutes := server.router.Group("/").Use(authMiddleware(server.token))
+	authRoutes.POST("/account", server.CreateAccount)
+	authRoutes.GET("/account/:id", server.GetAccount)
+	authRoutes.GET("/accounts", server.ListAccounts)
+	authRoutes.POST("/transfer", server.CreateTransfer)
 
 }
 

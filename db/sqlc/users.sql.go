@@ -17,7 +17,7 @@ INSERT INTO users (
   email, 
   contact
 ) VALUES (
-  $1, $2, $3,$4, $5
+  $1, $2, $3,$4,$5
 ) RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, contact
 `
 

@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	mockdb "simple-bank/db/mock"
 	db "simple-bank/db/sqlc"
+	"simple-bank/token"
 	"simple-bank/util"
 	"testing"
 	"time"
@@ -28,6 +29,7 @@ func TestCreateTransfer(t *testing.T) {
 		name               string
 		expectedStatusCode int
 		payloadBody        string
+		setupAuth          func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		setupStub          func(store *mockdb.MockStore, tranferargs transferRequest)
 		checkResponse      func(t *testing.T, transferRecord db.TransferTxResult, body *bytes.Buffer)
 	}{
@@ -36,6 +38,9 @@ func TestCreateTransfer(t *testing.T) {
 			name:               "Ok",
 			expectedStatusCode: http.StatusAccepted,
 			payloadBody:        `{"fromaccount_id": 2,"toaccount_id": 5,"currency": "INR","amount" :14}`,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user1.Username, time.Minute)
+			},
 			setupStub: func(store *mockdb.MockStore, tranferargs transferRequest) {
 
 				args := db.TransferTxParams{
@@ -91,6 +96,7 @@ func TestCreateTransfer(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(test.payloadBody)))
 			assert.NoError(t, err)
 			recorder := httptest.NewRecorder()
+			test.setupAuth(t, req, server.token)
 
 			server.router.ServeHTTP(recorder, req)
 
