@@ -1,5 +1,23 @@
 version: "3.8"
 services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      DB_SOURCE: postgres://username1:strongpassword@db:5432/simplebank?sslmode=disable  
+    depends_on:
+      - db
+    deploy:
+      mode: replicated
+      replicas: 1
+    entrypoint: [ "/app/wait-for.sh", "db:5432", "--", "/app/start.sh" ]
+    command: [ "/app/main" ] 
+  
+
   db:
     image: postgres
     container_name: local_pgdb
@@ -12,6 +30,7 @@ services:
       POSTGRES_PASSWORD: strongpassword
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+    
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
