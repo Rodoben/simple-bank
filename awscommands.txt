@@ -1,0 +1,35 @@
+ 
+    2  aws --version
+
+    4  aws configure
+    5  ls -al ~/.aws/
+    6  cat ~/.aws/config 
+    7  cat ~/.aws/credentials
+    8  aws secretmanager help
+    9  aws secretsmanager help
+   10  clear
+   11  aws secretsmanager get-secret-value help
+   12  lear
+   13  clear
+   14  aws secretsmanager get-secret-value --secret-id simple_bank
+   15  aws secretsmanager get-secret-value --secret-id simple_bank
+   16  aws secretsmanager get-secret-value --secret-id simple_bank
+   17  aws secretsmanager get-secret-value --secret-id simple_bank secretstring
+   18  aws secretsmanager get-secret-value --secret-id simple_bank secretString
+   19  aws secretsmanager get-secret-value --secret-id simple_bank SecretString
+   20  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString
+   21  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString output text
+   22  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text
+
+    24  brew install jq
+   25  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries'
+   26  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map(.key)'
+   27  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map(.value)'
+   28  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map(.key) map(.value) '
+   29  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map("/.key=/.value") '
+   30  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map("/(.key)=/(.value)") '
+   31  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map("/(.key)=/(.value)")'
+   32  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map("\(.key)=\(.value)")'
+   33  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq 'to_entries|map("\(.key)=\(.value)")|.[]'
+   34  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]'
+   3  aws secretsmanager get-secret-value --secret-id simple_bank  --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
